@@ -38,7 +38,7 @@ class RateRepository(
             .create(ExchangeRateService::class.java)
     }
 
-    private val supported = listOf("EUR","USD","GBP","CHF","CAD","DZD","TND","MAD","THB","JPY","AUD","CNY", "RUB" )
+    private val supported = listOf("EUR","USD","GBP","CHF","CAD","DZD","TND","MAD","THB","JPY","AUD","CNY", "RUB", "BRL " )
     private val cacheKeyRates = "rates_json"
     private val cacheKeyBase = "base"
     private val cacheKeyTimestamp = "timestamp"
