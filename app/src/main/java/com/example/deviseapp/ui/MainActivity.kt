@@ -1,16 +1,22 @@
 package com.example.deviseapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.widget.doOnTextChanged
 import com.example.deviseapp.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var auth: FirebaseAuth
     private var suppressFromChange = false
     private var suppressToChange = false
     private var selectedFromCode = "EUR"
@@ -40,6 +46,27 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Initialize Firebase Auth
+        auth = Firebase.auth
+
+        // Check if user is logged in
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            goToLoginActivity()
+            return
+        }
+
+        // Display user email
+        val userEmailText: TextView = findViewById(R.id.userEmail)
+        userEmailText.text = currentUser.email ?: "Utilisateur"
+
+        // Logout button
+        val logoutButton: Button = findViewById(R.id.logoutButton)
+        logoutButton.setOnClickListener {
+            auth.signOut()
+            goToLoginActivity()
+        }
 
         val inputAmountFrom: TextInputEditText = findViewById(R.id.inputAmountFrom)
         val inputAmountTo: TextInputEditText = findViewById(R.id.inputAmountTo)
@@ -162,6 +189,13 @@ class MainActivity : ComponentActivity() {
 
     private fun findPositionByCode(code: String): Int {
         return currencyDisplays.indexOfFirst { it.code == code }.takeIf { it >= 0 } ?: 0
+    }
+
+    private fun goToLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }
 
