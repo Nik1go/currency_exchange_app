@@ -49,7 +49,33 @@ Application Android pour tout vos voyages. Cette appli fait la conversion de dev
 4. **Clé API Google Maps/Places**
 
 
-## 📂 Structure du Projet
+## 📂PS C:\Users\leoja\AndroidStudioProjects\deviseAPP> git commit -m "nvll devise et maj readme"                             
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .idea/deploymentTargetSelector.xml
+        modified:   .idea/gradle.xml
+        modified:   .idea/misc.xml
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .bundle/
+        .idea/deviceManager.xml
+        .kotlin/
+        Gemfile
+        Gemfile.lock
+        ersleojaAndroidStudioProjectsdeviseAPP
+        et --hard HEAD~1
+        fastlane/
+        tatus
+        vendor/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Users\leoja\AndroidStudioProjects\deviseAPP> git add README.md app/src/main/java/com/example/deviseapp/ui/MainActivity.kt Structure du Projet
 
 ```
 deviseAPP/
