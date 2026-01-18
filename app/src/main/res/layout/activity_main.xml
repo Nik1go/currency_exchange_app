@@ -5,11 +5,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Currency Converter Section (scrollable) -->
+    <!-- Currency Converter Section (main content) -->
     <ScrollView
+        android:id="@+id/converterSection"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:orientation="vertical"
@@ -17,13 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Header avec user et logout -->
+            <!-- Header avec user, i18n et logout -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:id="@+id/userEmail"
@@ -34,6 +36,17 @@
                     android:textSize="14sp"
                     android:textColor="?attr/colorPrimary" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/i18nButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🌐 EN"
+                    android:textSize="12sp"
+                    android:minWidth="0dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp" />
+
                 <Button
                     android:id="@+id/logoutButton"
                     android:layout_width="wrap_content"
@@ -43,6 +56,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/labelSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Devise source" />
@@ -51,7 +65,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="4dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="0dp"
@@ -72,7 +86,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="8dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                     <AutoCompleteTextView
@@ -84,17 +98,29 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
+            <!-- Swap Button (icon only) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/swapButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:text="⇅"
+                android:textSize="20sp"
+                android:minWidth="48dp"
+                android:padding="0dp" />
+
             <TextView
+                android:id="@+id/labelTarget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Devise cible"
-                android:layout_marginTop="16dp" />
+                android:text="Devise cible" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="4dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="0dp"
@@ -115,7 +141,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="8dp"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
                     <AutoCompleteTextView
@@ -131,22 +157,40 @@
                 android:id="@+id/textStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:textColor="@android:color/holo_red_dark" />
+
+            <!-- Action Buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/historyButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Voir l'historique"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/showMapButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Bureaux de change à proximité"
+                android:textSize="15sp"
+                app:icon="@android:drawable/ic_menu_mylocation"
+                app:iconGravity="textStart" />
+
         </LinearLayout>
     </ScrollView>
 
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
-    <!-- Map Section (below converter) -->
+    <!-- Map Section (hidden by default) -->
     <FrameLayout
+        android:id="@+id/mapContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:visibility="gone">
 
         <fragment
             android:id="@+id/mapFragment"
@@ -154,13 +198,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!-- Close map button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/closeMapButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:text="✕ Fermer"
+            android:textColor="@android:color/black"
+            android:backgroundTint="#FFFFFF" />
+
         <!-- Search in this area button (FAB) -->
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/searchInAreaButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="56dp"
             android:text="Chercher dans cette zone"
             android:textColor="@android:color/white"
             app:icon="@android:drawable/ic_menu_search"

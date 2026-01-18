@@ -38,7 +38,12 @@ class RateRepository(
             .create(ExchangeRateService::class.java)
     }
 
-    private val supported = listOf("EUR","USD","GBP","CHF","CAD","DZD","TND","MAD","THB","JPY","AUD","CNY", "RUB", "BRL" )
+    // Devises supportées par Frankfurter API
+    private val supported = listOf(
+        "EUR", "USD", "GBP", "CHF", "CAD", "AUD", "JPY", "CNY", "BRL", "NOK",
+        "SEK", "DKK", "THB", "INR", "KRW", "MXN", "SGD", "HKD", "NZD", "ZAR",
+        "TRY", "PLN", "CZK", "HUF", "RON", "ILS", "PHP", "MYR", "IDR", "ISK"
+    )
     private val cacheKeyRates = "rates_json"
     private val cacheKeyBase = "base"
     private val cacheKeyTimestamp = "timestamp"

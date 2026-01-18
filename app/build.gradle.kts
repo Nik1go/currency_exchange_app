@@ -98,6 +98,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.android.libraries.places:places:3.3.0")
     
+    // Chart library for historical rates
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

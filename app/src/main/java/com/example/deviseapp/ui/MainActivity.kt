@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -55,6 +56,10 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     private lateinit var mapLoadingOverlay: LinearLayout
     private lateinit var searchInAreaButton: ExtendedFloatingActionButton
+    private lateinit var mapContainer: FrameLayout
+    
+    // i18n state
+    private var isEnglish = false
     
     // Gestion des changements de texte pour éviter les boucles infinies
     private var suppressFromChange = false
@@ -68,24 +73,38 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
     private var currencyDisplays: List<CurrencyDisplay> = emptyList()
     private var currencyAdapter: CurrencyAdapter? = null
 
-    // Catalogue de toutes les devises supportées
+    // Catalogue de toutes les devises supportées (Frankfurter API)
     private val currencyCatalog = mapOf(
         "EUR" to CurrencyDisplay("EUR", "Euro", "🇪🇺"),
         "USD" to CurrencyDisplay("USD", "Dollar américain", "🇺🇸"),
         "GBP" to CurrencyDisplay("GBP", "Livre sterling", "🇬🇧"),
         "CHF" to CurrencyDisplay("CHF", "Franc suisse", "🇨🇭"),
         "CAD" to CurrencyDisplay("CAD", "Dollar canadien", "🇨🇦"),
-        "DZD" to CurrencyDisplay("DZD", "Dinar algérien", "🇩🇿"),
-        "TND" to CurrencyDisplay("TND", "Dinar tunisien", "🇹🇳"),
-        "MAD" to CurrencyDisplay("MAD", "Dirham marocain", "🇲🇦"),
-        "THB" to CurrencyDisplay("THB", "Baht thaïlandais", "🇹🇭"),
-        "JPY" to CurrencyDisplay("JPY", "Yen japonais", "🇯🇵"),
         "AUD" to CurrencyDisplay("AUD", "Dollar australien", "🇦🇺"),
+        "JPY" to CurrencyDisplay("JPY", "Yen japonais", "🇯🇵"),
         "CNY" to CurrencyDisplay("CNY", "Yuan chinois", "🇨🇳"),
-        "RUB" to CurrencyDisplay("RUB", "Ruble russe", "🇷🇺"),
-        "BRL" to CurrencyDisplay("BRL", "Real Brésil", "🇧🇷"),
+        "BRL" to CurrencyDisplay("BRL", "Real brésilien", "🇧🇷"),
         "NOK" to CurrencyDisplay("NOK", "Couronne norvégienne", "🇳🇴"),
-        "VND" to CurrencyDisplay("VND", "Dong vietnamien", "🇻🇳")
+        "SEK" to CurrencyDisplay("SEK", "Couronne suédoise", "🇸🇪"),
+        "DKK" to CurrencyDisplay("DKK", "Couronne danoise", "🇩🇰"),
+        "THB" to CurrencyDisplay("THB", "Baht thaïlandais", "🇹🇭"),
+        "INR" to CurrencyDisplay("INR", "Roupie indienne", "🇮🇳"),
+        "KRW" to CurrencyDisplay("KRW", "Won sud-coréen", "🇰🇷"),
+        "MXN" to CurrencyDisplay("MXN", "Peso mexicain", "🇲🇽"),
+        "SGD" to CurrencyDisplay("SGD", "Dollar singapourien", "🇸🇬"),
+        "HKD" to CurrencyDisplay("HKD", "Dollar hongkongais", "🇭🇰"),
+        "NZD" to CurrencyDisplay("NZD", "Dollar néo-zélandais", "🇳🇿"),
+        "ZAR" to CurrencyDisplay("ZAR", "Rand sud-africain", "🇿🇦"),
+        "TRY" to CurrencyDisplay("TRY", "Livre turque", "🇹🇷"),
+        "PLN" to CurrencyDisplay("PLN", "Złoty polonais", "🇵🇱"),
+        "CZK" to CurrencyDisplay("CZK", "Couronne tchèque", "🇨🇿"),
+        "HUF" to CurrencyDisplay("HUF", "Forint hongrois", "🇭🇺"),
+        "RON" to CurrencyDisplay("RON", "Leu roumain", "🇷🇴"),
+        "ILS" to CurrencyDisplay("ILS", "Shekel israélien", "🇮🇱"),
+        "PHP" to CurrencyDisplay("PHP", "Peso philippin", "🇵🇭"),
+        "MYR" to CurrencyDisplay("MYR", "Ringgit malaisien", "🇲🇾"),
+        "IDR" to CurrencyDisplay("IDR", "Roupie indonésienne", "🇮🇩"),
+        "ISK" to CurrencyDisplay("ISK", "Couronne islandaise", "🇮🇸")
     )
 
     // Gestion des permissions de localisation
@@ -147,12 +166,64 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
             goToLoginActivity()
         }
         
+        // MapContainer pour afficher/cacher la carte
+        mapContainer = findViewById(R.id.mapContainer)
+        
+        // Bouton i18n (toggle FR/EN)
+        val i18nButton: Button = findViewById(R.id.i18nButton)
+        i18nButton.setOnClickListener {
+            isEnglish = !isEnglish
+            updateLanguage(i18nButton)
+        }
+        
+        // Bouton pour afficher la carte
+        val showMapButton: Button = findViewById(R.id.showMapButton)
+        showMapButton.setOnClickListener {
+            mapContainer.visibility = View.VISIBLE
+            requestLocationPermission()
+        }
+        
+        // Bouton pour fermer la carte
+        val closeMapButton: Button = findViewById(R.id.closeMapButton)
+        closeMapButton.setOnClickListener {
+            mapContainer.visibility = View.GONE
+        }
+        
         // Initialisation de la carte Google Maps
         val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         setupCurrencyConverter()
-        requestLocationPermission()
+    }
+    
+    /**
+     * Met à jour les textes selon la langue sélectionnée
+     */
+    private fun updateLanguage(i18nButton: Button) {
+        val labelSource: TextView = findViewById(R.id.labelSource)
+        val labelTarget: TextView = findViewById(R.id.labelTarget)
+        val historyButton: Button = findViewById(R.id.historyButton)
+        val showMapButton: Button = findViewById(R.id.showMapButton)
+        val logoutButton: Button = findViewById(R.id.logoutButton)
+        val closeMapButton: Button = findViewById(R.id.closeMapButton)
+        
+        if (isEnglish) {
+            i18nButton.text = "🌐 FR"
+            labelSource.text = "Source currency"
+            labelTarget.text = "Target currency"
+            historyButton.text = "View history"
+            showMapButton.text = "Exchange offices nearby"
+            logoutButton.text = "Logout"
+            closeMapButton.text = "✕ Close"
+        } else {
+            i18nButton.text = "🌐 EN"
+            labelSource.text = "Devise source"
+            labelTarget.text = "Devise cible"
+            historyButton.text = "Voir l'historique"
+            showMapButton.text = "Bureaux de change à proximité"
+            logoutButton.text = "Déconnexion"
+            closeMapButton.text = "✕ Fermer"
+        }
     }
     
     /**
@@ -165,6 +236,46 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         val currencyFromInput: AutoCompleteTextView = findViewById(R.id.inputCurrencyFrom)
         val currencyToInput: AutoCompleteTextView = findViewById(R.id.inputCurrencyTo)
         val textStatus: TextView = findViewById(R.id.textStatus)
+        val historyButton: Button = findViewById(R.id.historyButton)
+        val swapButton: Button = findViewById(R.id.swapButton)
+        
+        // Setup history button
+        historyButton.setOnClickListener {
+            val intent = Intent(this, HistoryActivity::class.java).apply {
+                putExtra(HistoryActivity.EXTRA_BASE_CURRENCY, selectedFromCode)
+                putExtra(HistoryActivity.EXTRA_TARGET_CURRENCY, selectedToCode)
+            }
+            startActivity(intent)
+        }
+        
+        // Setup swap button
+        swapButton.setOnClickListener {
+            // Swap the selected currencies
+            val tempCode = selectedFromCode
+            selectedFromCode = selectedToCode
+            selectedToCode = tempCode
+            
+            // Swap the amounts
+            val tempAmount = inputAmountFrom.text?.toString() ?: ""
+            inputAmountFrom.setText(inputAmountTo.text?.toString() ?: "")
+            inputAmountTo.setText(tempAmount)
+            
+            // Update the currency dropdowns
+            currencyCatalog[selectedFromCode]?.let { from ->
+                currencyFromInput.setText("${from.flag} ${from.code} - ${from.name}", false)
+            }
+            currencyCatalog[selectedToCode]?.let { to ->
+                currencyToInput.setText("${to.flag} ${to.code} - ${to.name}", false)
+            }
+            
+            // Trigger conversion
+            viewModel.onAmountChanged(
+                MainViewModel.AmountField.FROM,
+                inputAmountFrom.text?.toString() ?: "",
+                selectedFromCode,
+                selectedToCode
+            )
+        }
 
         // Observer les devises disponibles
         viewModel.currencies.observe(this) { codes ->
