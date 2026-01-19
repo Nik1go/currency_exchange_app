@@ -70,7 +70,7 @@ class HistoryActivity : AppCompatActivity() {
         periodToggleGroup = findViewById(R.id.periodToggleGroup)
         
         // Setup toolbar
-        toolbar.title = "Historique $baseCurrency → $targetCurrency"
+        toolbar.title = "HISTORIQUE $baseCurrency → $targetCurrency"
         toolbar.setNavigationOnClickListener { finish() }
         
         // Setup currency pair text

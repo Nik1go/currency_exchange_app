@@ -14,7 +14,7 @@
         android:background="?attr/colorPrimary"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="?attr/colorOnPrimary"
-        app:title="Historique"
+        app:title="HISTORIQUE DE CHANGE"
         app:titleTextColor="?attr/colorOnPrimary" />
 
     <!-- Period Toggle Buttons -->
